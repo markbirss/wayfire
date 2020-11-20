@@ -4,6 +4,16 @@
 #include <wayfire/util/log.hpp>
 
 
+static bool begins_with(std::string word, std::string prefix)
+{
+    if (word.length() < prefix.length())
+    {
+        return false;
+    }
+
+    return word.substr(0, prefix.length()) == prefix;
+}
+
 class vswitch : public wf::plugin_interface_t
 {
   private:
@@ -33,6 +43,7 @@ class vswitch : public wf::plugin_interface_t
 
     std::unique_ptr<vswitch_basic_plugin> algorithm;
     std::unique_ptr<wf::vswitch::control_bindings_t> bindings;
+    std::vector<wf::activator_callback> direct_bindings;
 
     // Capabilities which are always required for vswitch, for now wall needs
     // a custom renderer.
@@ -77,6 +88,49 @@ class vswitch : public wf::plugin_interface_t
                 return false;
             }
         });
+
+        std::vector<std::string> workspace_numbers;
+        const std::string select_prefix = "select_workspace_";
+        auto section = wf::get_core().config.get_section("vswitch");
+        for (auto binding : section->get_registered_options())
+        {
+            if (begins_with(binding->get_name(), select_prefix))
+            {
+                workspace_numbers.push_back(
+                    binding->get_name().substr(select_prefix.length()));
+            }
+        }
+
+        for (size_t i = 0; i < workspace_numbers.size(); i++)
+        {
+            auto binding = select_prefix + workspace_numbers[i];
+            int workspace_index = atoi(workspace_numbers[i].c_str());
+
+            auto wsize = output->workspace->get_workspace_grid_size();
+            if ((workspace_index > (wsize.width * wsize.height)) ||
+                (workspace_index < 1))
+            {
+                continue;
+            }
+
+            workspace_index--;
+            int y = workspace_index / wsize.width;
+            wf::point_t target{workspace_index - y * wsize.width, y};
+
+            auto opt   = section->get_option(binding);
+            auto value = wf::option_type::from_string<wf::activatorbinding_t>(
+                opt->get_value_str());
+
+            wf::activator_callback callback = [=] (auto)
+            {
+                output->workspace->request_workspace(target);
+                return true;
+            };
+
+            direct_bindings.push_back(callback);
+            output->add_activator(wf::create_option(value.value()),
+                &direct_bindings[i]);
+        }
     }
 
     inline bool is_active()
@@ -206,6 +260,11 @@ class vswitch : public wf::plugin_interface_t
         }
 
         bindings->tear_down();
+
+        for (size_t i = 0; i < direct_bindings.size(); i++)
+        {
+            output->rem_binding(&direct_bindings[i]);
+        }
     }
 };
 
