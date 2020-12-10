@@ -172,7 +172,6 @@ static wf::config_backend_t *load_backend(const std::string& backend)
 
 int main(int argc, char *argv[])
 {
-
     wf::log::log_level_t log_level = wf::log::LOG_LEVEL_INFO;
     struct option opts[] = {
         {
