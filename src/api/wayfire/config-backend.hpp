@@ -50,3 +50,11 @@ class config_backend_t
     virtual ~config_backend_t() = default;
 };
 }
+
+/** A macro to declare the necessary functions for loading the plugin, given the plugin class name */
+#define DECLARE_WAYFIRE_PLUGIN(PluginClass) \
+    extern "C" \
+    { \
+        wf::config_backend_t*newInstance() { return new PluginClass; } \
+        uint32_t getWayfireVersion() { return WAYFIRE_API_ABI_VERSION; } \
+    }
