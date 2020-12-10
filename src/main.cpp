@@ -31,7 +31,8 @@ static void print_help()
     std::cout << "Wayfire " << WAYFIRE_VERSION << std::endl;
     std::cout << "Usage: wayfire [OPTION]...\n" << std::endl;
     std::cout << " -c,  --config            specify config file to use" << std::endl;
-    std::cout << " -B,  --config-backend    specify config backend to use" << std::endl;
+    std::cout << " -B,  --config-backend    specify config backend to use" <<
+    std::endl;
     std::cout << " -h,  --help              print this help" << std::endl;
     std::cout << " -d,  --debug             enable debug logging" << std::endl;
     std::cout <<
