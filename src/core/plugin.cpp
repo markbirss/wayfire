@@ -1,4 +1,5 @@
 #include "core-impl.hpp"
+#include "wayfire/debug.hpp"
 #include "wayfire/output.hpp"
 #include "seat/input-manager.hpp"
 #include "wayfire/signal-definitions.hpp"
@@ -104,6 +105,15 @@ std::shared_ptr<config::section_t> wf::config_backend_t::get_output_section(
 std::shared_ptr<config::section_t> wf::config_backend_t::get_input_device_section(
     wlr_input_device *device)
 {
-    return NULL; // TODO
+    std::string name = nonull(device->name);
+    name = "input-device:" + name;
+    auto& config = wf::get_core().config;
+    if (!config.get_section(name))
+    {
+        config.merge_section(
+            config.get_section("input-device")->clone_with_name(name));
+    }
+
+    return config.get_section(name);
 }
 }
