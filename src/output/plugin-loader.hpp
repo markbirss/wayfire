@@ -53,7 +53,6 @@ B union_cast(A object)
     return helper.y;
 }
 
-
 /**
  * Open a plugin file and check the file for version errors.
  *
@@ -63,7 +62,6 @@ B union_cast(A object)
  * @return (dlopen() handle, newInstance pointer)
  */
 std::pair<void*, void*> get_new_instance_handle(const std::string& path);
-
 }
 
 #endif /* end of include guard: PLUGIN_LOADER_HPP */
