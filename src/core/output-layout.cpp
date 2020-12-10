@@ -243,7 +243,7 @@ struct output_layout_output_t
 
     void initialize_config_options()
     {
-        auto name = get_section_name();
+        auto name    = get_section_name();
         auto& config = wf::get_core().config;
         if (!config.get_section(name))
         {
@@ -371,34 +371,36 @@ struct output_layout_output_t
         wf::output_config::mode_t mode = mode_opt;
         wlr_output_mode tmp;
 
-        LOGI("loaded mode ", ((wf::option_sptr_t<wf::output_config::mode_t>)mode_opt)->get_value_str());
+        LOGI("loaded mode ",
+            ((wf::option_sptr_t<wf::output_config::mode_t>)mode_opt)->get_value_str());
 
         switch (mode.get_type())
         {
-            case output_config::MODE_AUTO:
-              state.mode = select_default_mode();
-              state.source = OUTPUT_IMAGE_SOURCE_SELF;
-              break;
-              // fallthrough
-            case output_config::MODE_RESOLUTION:
-              tmp.width = mode.get_width();
-              tmp.height = mode.get_height();
-              tmp.refresh = mode.get_refresh();
-              state.mode = (is_mode_supported(tmp) ? tmp : select_default_mode());
-              state.source = OUTPUT_IMAGE_SOURCE_SELF;
-              break;
+          case output_config::MODE_AUTO:
+            state.mode   = select_default_mode();
+            state.source = OUTPUT_IMAGE_SOURCE_SELF;
+            break;
 
-            case output_config::MODE_OFF:
-                state.source = OUTPUT_IMAGE_SOURCE_NONE;
-                return state;
+          // fallthrough
+          case output_config::MODE_RESOLUTION:
+            tmp.width    = mode.get_width();
+            tmp.height   = mode.get_height();
+            tmp.refresh  = mode.get_refresh();
+            state.mode   = (is_mode_supported(tmp) ? tmp : select_default_mode());
+            state.source = OUTPUT_IMAGE_SOURCE_SELF;
+            break;
 
-            case output_config::MODE_MIRROR:
-                state.source = OUTPUT_IMAGE_SOURCE_MIRROR;
-                state.mode = select_default_mode();
-                break;
+          case output_config::MODE_OFF:
+            state.source = OUTPUT_IMAGE_SOURCE_NONE;
+            return state;
+
+          case output_config::MODE_MIRROR:
+            state.source = OUTPUT_IMAGE_SOURCE_MIRROR;
+            state.mode   = select_default_mode();
+            break;
         }
 
-        state.scale = scale_opt;
+        state.scale     = scale_opt;
         state.transform = get_transform_from_string(transform_opt);
         return state;
     }
