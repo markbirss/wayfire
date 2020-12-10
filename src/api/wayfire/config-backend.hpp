@@ -51,7 +51,10 @@ class config_backend_t
 };
 }
 
-/** A macro to declare the necessary functions for loading the plugin, given the plugin class name */
+/**
+ * A macro to declare the necessary functions for loading the plugin,
+ * given the plugin class name.
+ */
 #define DECLARE_WAYFIRE_PLUGIN(PluginClass) \
     extern "C" \
     { \
