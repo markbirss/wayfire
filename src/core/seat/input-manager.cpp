@@ -76,6 +76,7 @@ void wf::input_manager_t::refresh_device_mappings()
         auto wo = wf::get_core().output_layout->find_output(mapped_output);
         if (wo)
         {
+            LOGD("Mapping input ", dev->name, " to output ", wo->to_string(), ".");
             wlr_cursor_map_input_to_output(cursor, dev, wo->handle);
         }
     }
