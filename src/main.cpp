@@ -31,6 +31,7 @@ static void print_help()
     std::cout << "Wayfire " << WAYFIRE_VERSION << std::endl;
     std::cout << "Usage: wayfire [OPTION]...\n" << std::endl;
     std::cout << " -c,  --config            specify config file to use" << std::endl;
+    std::cout << " -B,  --config-backend    specify config backend to use" << std::endl;
     std::cout << " -h,  --help              print this help" << std::endl;
     std::cout << " -d,  --debug             enable debug logging" << std::endl;
     std::cout <<
@@ -177,6 +178,9 @@ int main(int argc, char *argv[])
         {
             "config", required_argument, NULL, 'c'
         },
+        {
+            "config-backend", required_argument, NULL, 'B'
+        },
         {"debug", no_argument, NULL, 'd'},
         {"damage-debug", no_argument, NULL, 'D'},
         {"damage-rerender", no_argument, NULL, 'R'},
@@ -186,14 +190,19 @@ int main(int argc, char *argv[])
     };
 
     std::string config_file;
+    std::string config_backend = WF_DEFAULT_CONFIG_BACKEND;
 
     int c, i;
-    while ((c = getopt_long(argc, argv, "c:dDhRv", opts, &i)) != -1)
+    while ((c = getopt_long(argc, argv, "c:B:dDhRv", opts, &i)) != -1)
     {
         switch (c)
         {
           case 'c':
             config_file = optarg;
+            break;
+
+          case 'B':
+            config_backend = optarg;
             break;
 
           case 'D':
@@ -259,7 +268,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    auto backend = load_backend("/usr/lib64/wayfire/libdefault-config-backend.so");
+    auto backend = load_backend(config_backend);
     if (!backend)
     {
         LOGE("Failed to load configuration backend!");
@@ -268,6 +277,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    LOGD("Using configuration backend: ", config_backend);
     core.config_backend = std::unique_ptr<wf::config_backend_t>(backend);
     core.config_backend->init(display, core.config, config_file);
     core.init();
