@@ -52,6 +52,10 @@ class config_backend_t
         wlr_input_device *device);
 
     virtual ~config_backend_t() = default;
+
+  protected:
+    /** A helper to read the XML directories that Wayfire looks at */
+    virtual std::vector<std::string> get_xml_dirs() const;
 };
 }
 

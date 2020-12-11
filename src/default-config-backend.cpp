@@ -61,22 +61,9 @@ class dynamic_ini_config_t : public wf::config_backend_t
             config_file = cfg_file;
         }
 
-        std::vector<std::string> xmldirs;
-        if (char *plugin_xml_path = getenv("WAYFIRE_PLUGIN_XML_PATH"))
-        {
-            std::stringstream ss(plugin_xml_path);
-            std::string entry;
-            while (std::getline(ss, entry, ':'))
-            {
-                xmldirs.push_back(entry);
-            }
-        }
-
-        xmldirs.push_back(PLUGIN_XML_DIR);
-
         LOGI("Using config file: ", config_file.c_str());
         config = wf::config::build_configuration(
-            xmldirs, SYSCONFDIR "/wayfire/defaults.ini", config_file);
+            get_xml_dirs(), SYSCONFDIR "/wayfire/defaults.ini", config_file);
 
         int inotify_fd = inotify_init1(IN_CLOEXEC);
         reload_config(inotify_fd);
