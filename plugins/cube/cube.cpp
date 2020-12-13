@@ -141,12 +141,6 @@ class wayfire_cube : public wf::plugin_interface_t
             }
         };
 
-        grab_interface->callbacks.pointer.relative_motion =
-            [=] (wlr_event_pointer_motion *ev)
-        {
-            pointer_moved(ev);
-        };
-
         grab_interface->callbacks.pointer.axis = [=] (
             wlr_event_pointer_axis *ev)
         {
@@ -273,6 +267,7 @@ class wayfire_cube : public wf::plugin_interface_t
             return false;
         }
 
+        wf::get_core().connect_signal("pointer_motion", &on_motion_event);
         output->render->set_renderer(renderer);
         output->render->schedule_redraw();
         wf::get_core().hide_cursor();
@@ -301,6 +296,7 @@ class wayfire_cube : public wf::plugin_interface_t
         grab_interface->ungrab();
         output->deactivate_plugin(grab_interface);
         wf::get_core().unhide_cursor();
+        wf::get_core().disconnect_signal("pointer_motion", &on_motion_event);
 
         /* Figure out how much we have rotated and switch workspace */
         int size = get_num_faces();
@@ -565,6 +561,19 @@ class wayfire_cube : public wf::plugin_interface_t
             deactivate();
         }
     }
+
+    wf::signal_callback_t on_motion_event = [=] (wf::signal_data_t *data)
+    {
+        auto ev = static_cast<
+            wf::input_event_signal<wlr_event_pointer_motion>*>(data);
+
+        pointer_moved(ev->event);
+
+        ev->event->delta_x    = 0;
+        ev->event->delta_y    = 0;
+        ev->event->unaccel_dx = 0;
+        ev->event->unaccel_dy = 0;
+    };
 
     void pointer_moved(wlr_event_pointer_motion *ev)
     {
